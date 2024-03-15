@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define BLOCK_SIZE 16
+void ECB_encrypt(unsigned char *plaintext, unsigned char *key, int length);
+void ECB_decrypt(unsigned char *ciphertext, unsigned char *key, int length);
+void CBC_encrypt(unsigned char *plaintext, unsigned char *key, int length, unsigned char *iv);
+void CBC_decrypt(unsigned char *ciphertext, unsigned char *key, int length, unsigned char *iv);
+void CFB_encrypt(unsigned char *plaintext, unsigned char *key, int length, unsigned char *iv);
+void CFB_decrypt(unsigned char *ciphertext, unsigned char *key, int length, unsigned char *iv);
+int main() {
+    unsigned char plaintext[] = "This is a test message.";
+    unsigned char key[] = "secretkey1234567";
+    unsigned char iv[] = "initializationv";
+    int plaintext_len = strlen(plaintext);
+    int padded_len = plaintext_len + (BLOCK_SIZE - (plaintext_len % BLOCK_SIZE));
+    unsigned char *padded_plaintext = (unsigned char *)malloc(padded_len * sizeof(unsigned char));
+    memset(padded_plaintext, 0, padded_len);
+    memcpy(padded_plaintext, plaintext, plaintext_len);
+    printf("Original plaintext: %s\n", plaintext);
+    printf("Padded plaintext: %s\n", padded_plaintext);
+    ECB_encrypt(padded_plaintext, key, padded_len);
+    ECB_decrypt(padded_plaintext, key, padded_len);
+    memcpy(padded_plaintext, plaintext, plaintext_len);
+    CBC_encrypt(padded_plaintext, key, padded_len, iv);
+    CBC_decrypt(padded_plaintext, key, padded_len, iv);
+    memcpy(padded_plaintext, plaintext, plaintext_len);
+    CFB_encrypt(padded_plaintext, key, padded_len, iv);
+    CFB_decrypt(padded_plaintext, key, padded_len, iv);
+    free(padded_plaintext);
+    return 0;
+}
+void ECB_encrypt(unsigned char *plaintext, unsigned char *key, int length) {
+    printf("ECB Encryption:\n");
+    printf("Encryption process here...\n");
+}
+void ECB_decrypt(unsigned char *ciphertext, unsigned char *key, int length) {
+    printf("ECB Decryption:\n");
+    printf("Decryption process here...\n");
+}
+void CBC_encrypt(unsigned char *plaintext, unsigned char *key, int length, unsigned char *iv) {
+    printf("CBC Encryption:\n");
+    printf("Encryption process here...\n");
+}
+void CBC_decrypt(unsigned char *ciphertext, unsigned char *key, int length, unsigned char *iv) {
+    printf("CBC Decryption:\n");
+    printf("Decryption process here...\n");
+}
+void CFB_encrypt(unsigned char *plaintext, unsigned char *key, int length, unsigned char *iv) {
+    printf("CFB Encryption:\n");
+    printf("Encryption process here...\n");
+}
+void CFB_decrypt(unsigned char *ciphertext, unsigned char *key, int length, unsigned char *iv) {
+    printf("CFB Decryption:\n");
+    printf("Decryption process here...\n");
+}
