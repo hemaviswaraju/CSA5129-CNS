@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <openssl/dsa.h>
+#include <openssl/bn.h>
+
+// Function to generate a DSA key pair
+DSA* generateDSAKeyPair() {
+    DSA *dsa = DSA_new();
+    if (dsa == NULL) {
+        fprintf(stderr, "Error creating DSA structure.\n");
+        return NULL;
+    }
+    int bits = 1024; // Key size
+    if (!DSA_generate_parameters_ex(dsa, bits, NULL, 0, NULL, NULL, NULL)) {
+        fprintf(stderr, "Error generating DSA parameters.\n");
+        return NULL;
+    }
+    if (!DSA_generate_key(dsa)) {
+        fprintf(stderr, "Error generating DSA key pair.\n");
+        DSA_free(dsa);
+        return NULL;
+    }
+    return dsa;
+}
+
+// Function to sign a message using DSA
+DSA_SIG* signDSA(const char *message, DSA *dsa) {
+    if (message == NULL || dsa == NULL) {
+        fprintf(stderr, "Invalid input.\n");
+        return NULL;
+    }
+    DSA_SIG *signature = DSA_do_sign((unsigned char *)message, strlen(message), dsa);
+    if (signature == NULL) {
+        fprintf(stderr, "Error signing the message.\n");
+        return NULL;
+    }
+    return signature;
+}
+
+// Function to verify the signature of a message
+int verifySignature(const char *message, DSA_SIG *signature, DSA *dsa) {
+    if (message == NULL || signature == NULL || dsa == NULL) {
+        fprintf(stderr, "Invalid input.\n");
+        return -1;
+    }
+    int verified = DSA_do_verify((unsigned char *)message, strlen(message), signature, dsa);
+    return verified;
+}
+
+int main() {
+    // Generate DSA key pair
+    DSA *dsa = generateDSAKeyPair();
+    if (dsa == NULL) {
+        fprintf(stderr, "Error generating DSA key pair.\n");
+        return 1;
+    }
+
+    const char *message = "Hello, world!";
+
+    // Sign the message
+    DSA_SIG *signature = signDSA(message, dsa);
+    if (signature == NULL) {
+        fprintf(stderr, "Error signing the message.\n");
+        DSA_free(dsa);
+        return 1;
+    }
+
+    // Verify the signature
+    int verified = verifySignature(message, signature, dsa);
+    if (verified == 1) {
+        printf("Signature verified successfully.\n");
+    } else if (verified == 0) {
+        printf("Signature verification failed.\n");
+    } else {
+        fprintf(stderr, "Error verifying signature.\n");
+    }
+
+    // Clean up
+    DSA_SIG_free(signature);
+    DSA_free(dsa);
+    return 0;
+}
